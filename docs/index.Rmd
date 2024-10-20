@@ -37,17 +37,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Loop over Games to build df
 df.GAME <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(df.GAME) <- c(read.csv(paste0(DIR,
-                                       "/Game01.csv"),
+                                       "/Results/Game01.csv"),
                                 header = FALSE)[4,],
                        "Game")
 
-for (GAME in list.files(DIR, pattern = ".csv")) {
+for (GAME in list.files(paste0(DIR, "/Results"),
+                        pattern = ".csv")) {
   
   df.GAME.inter <- read.csv(paste0(DIR,
-                                   "/", GAME),
+                                   "/Results/", GAME),
                             header = FALSE, skip = 4)
   colnames(df.GAME.inter) <- read.csv(paste0(DIR,
-                                             "/", GAME),
+                                             "/Results/", GAME),
                                       header = FALSE)[4,]
   
   df.GAME.inter[is.na(df.GAME.inter)] <- 0
@@ -100,11 +101,11 @@ df.GAME[["Game.Time.min"]] <- ""
 for (GAME in unique(df.GAME[["Game"]])) {
   
   GAME.START.HR <- as.numeric(word(gsub(":", " ", read.csv(paste0(DIR,
-                                                                  "/", GAME, ".csv"),
+                                                                  "/Results/", GAME, ".csv"),
                                                            header = FALSE)[2,2]),
                                    1))
   GAME.START.MIN <- as.numeric(word(gsub(":", " ", read.csv(paste0(DIR,
-                                                                   "/", GAME, ".csv"),
+                                                                   "/Results/", GAME, ".csv"),
                                                             header = FALSE)[2,2]),
                                     2))
   
@@ -402,8 +403,8 @@ reactable(df.GAME %>%
 
 **Game 01 12/09/2024**
 
-![*Ian*](/home/bpf24/Desktop/Poker/2024_2025/Game01_Winner.jpeg){width=250px}
+![*Ian*](/home/bpf24/Desktop/Poker/2024_2025/Pictures/Game01_Winner.jpeg){width=250px}
 
 **Game 02 16/19/2024**
 
-![*Dave*](/home/bpf24/Desktop/Poker/2024_2025/Game02_001.jpeg){width=250px}
+![*Dave*](/home/bpf24/Desktop/Poker/2024_2025/Pictures/Game02_001.jpeg){width=250px}
