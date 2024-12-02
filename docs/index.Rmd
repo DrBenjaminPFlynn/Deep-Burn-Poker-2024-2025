@@ -1,7 +1,7 @@
 ---
 title: "Deep Burn Poker League"
 author: "Sep 2024 - Aug 2025"
-date: "Life is not always a matter of holding good hands, but sometimes playing a poor hand well"
+date: "Sex is good, they say, but poker lasts longer. ~ Al Alvarez"
 output: 
   prettydoc::html_pretty:
     theme: hpstr
@@ -18,6 +18,7 @@ library(knitr)
 library(reactable)
 library(ggpubr)
 library(ggrepel)
+library(plyr)
 
 DIR <- "~/Desktop/Poker/2024_2025"
 
@@ -273,41 +274,44 @@ colnames(df.POINT.TALLY) <- COLNAMES
 # Order by games for the cumulative dataframe build
 df.GAME.inter <- df.GAME[order(df.GAME[["Game"]], decreasing = FALSE),]
 
+## NEED TO FIX THIS BIT!!!!-----
+
 for (PLAYER in PLAYERS) {
   
-  if (nrow(df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER,]) == 1) {
-    df.inter <- data.frame(
-      Player = PLAYER,
-      Game = df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER, ][["Game"]],
-      Total.Points = df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER, ][["Total.Points"]],
-      LABEL = PLAYER
-    )
-    
-    df.POINT.TALLY <- rbind(df.POINT.TALLY, df.inter)
-    
-  }else{
-    if (nrow(df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER,]) == 2) {
-      
-      df.inter <- df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER,]
-      df.inter[2, ][["Total.Points"]] <- sum(df.GAME.inter[df.GAME.inter[["Player"]] == PLAYER, "Total.Points"])
-      
-      df.inter <- cbind(df.inter[, c("Player", "Game", "Total.Points")],
-                        data.frame(LABEL = c("", PLAYER)))
-      
-      df.POINT.TALLY <- rbind(df.POINT.TALLY,
-                              df.inter[, c("Player", "Game", "Total.Points", "LABEL")])
+  df.inter <- filter(df.GAME.inter, Player %in% PLAYER)
+  df.inter[["Runing.Total"]] <- df.inter[1, "Total.Points"]
+  
+  ## Add label to most recent game for ggplot
+  df.inter[["LABEL"]] <- ""
+  df.inter[nrow(df.inter),][["LABEL"]] <- PLAYER
+  
+  if (nrow(df.inter) > 2) {
+    for (GAME.NO in seq(2, nrow(df.inter))) {
+      df.inter[GAME.NO, ][["Runing.Total"]] <- df.inter[GAME.NO-1, ][["Runing.Total"]] + df.inter[GAME.NO, ][["Total.Points"]] # More than two games
     }
+  }else{
+    
+    if (nrow(df.inter) == 2) {
+      df.inter[2,][["Runing.Total"]] <- df.inter[1, ][["Total.Points"]] + df.inter[2, ][["Total.Points"]] # only two games played
+    }
+    
   }
+  
+  df.inter <- select(df.inter, Player, Game, Runing.Total, LABEL)
+  colnames(df.inter) <- COLNAMES
+  
+  df.POINT.TALLY <- rbind(df.POINT.TALLY, df.inter)
 }
 
 rm(COLNAMES, df.GAME.inter, df.inter)
 gc()
 
 df.POINT.TALLY[["Game"]] <- as.numeric(df.POINT.TALLY[["Game"]])
-
-# Cumulative total points
-PLOT.PTS <- ggplot(df.POINT.TALLY, aes(x = Game, y = Total.Points, 
-                                       col = Player, label = LABEL)) +
+TOTAL.POINTS.MAX <- round_any(max(df.POINT.TALLY[["Total.Points"]]) + 1, 20, f = ceiling)
+  
+  # Cumulative total points
+  PLOT.PTS <- ggplot(df.POINT.TALLY, aes(x = Game, y = Total.Points, 
+                                         col = Player, label = LABEL)) +
   geom_point() +
   geom_label_repel() +
   geom_line(alpha = 0.4) +
@@ -323,7 +327,8 @@ PLOT.PTS <- ggplot(df.POINT.TALLY, aes(x = Game, y = Total.Points,
                      breaks = seq(min(df.POINT.TALLY[["Game"]]),
                                   max(df.POINT.TALLY[["Game"]]),
                                   1)) +
-  scale_y_continuous(limits = c(0, 200), breaks = seq(0, 200, 20))
+  scale_y_continuous(limits = c(0, TOTAL.POINTS.MAX), 
+                     breaks = seq(0, TOTAL.POINTS.MAX, 20))
 
 # Distribution of league points
 PLOT.VLN.PTS <- ggplot(df.GAME, aes(x = Player, y = League.Points)) +
@@ -337,7 +342,7 @@ PLOT.VLN.PTS <- ggplot(df.GAME, aes(x = Player, y = League.Points)) +
         axis.ticks = element_line(color = "black"),
         legend.position = "none",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  scale_y_continuous(limits = c(10, 100), breaks = seq(10, 100, 10))
+  scale_y_continuous(limits = c(10, 200), breaks = seq(10, 200, 10))
 
 # Distribution of kill points
 PLOT.KILL.PTS <- ggplot(df.GAME, aes(x = Player, y = Kill.Points)) +
@@ -367,7 +372,7 @@ ggarrange(PLOT.VLN.PTS, PLOT.KILL.PTS,
 # Breakdown of results
 ```{r Previous Game Table, echo=FALSE, message=FALSE, warning=FALSE}
 # Add a number of games column
-  
+
 # Results broken down by game
 reactable(df.GAME %>%
             mutate(Avg.Game.Time.min = df.GAME[["Game.Time.min"]]) %>%
@@ -408,3 +413,7 @@ reactable(df.GAME %>%
 **Game 02 16/19/2024**
 
 ![*Dave*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game02_001.jpeg){width=250px}
+
+**Game 03 28/11/2024**
+
+![*Sarah*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game03_Winner.jpeg){width=250px}
