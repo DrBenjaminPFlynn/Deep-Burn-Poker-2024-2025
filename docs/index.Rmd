@@ -19,6 +19,8 @@ library(reactable)
 library(ggpubr)
 library(ggrepel)
 library(plyr)
+library(gganimate)
+library(beepr) # beeps when script has run
 
 DIR <- "~/Desktop/Poker/2024_2025"
 
@@ -27,6 +29,10 @@ POSITION.POINTS <- data.frame(Position = seq(1, 22),
                               Points = c(100, 80, 70, 60, 50, 40, 35, 30, 25, 20, 20, 20, rep(10, 10)))
 
 BOUNTY.POINTS <- 5
+
+# Save default ggplot theme & set new
+OLD.GGPLOT.THEME <- theme_get()
+theme_set(theme_light())
 ```
 
 ```{r Per.Game.Stats, include=FALSE}
@@ -267,39 +273,60 @@ reactable(df.FINAL %>%
 ```{r Trend data, include=FALSE}
 
 # Calculate cumulative point tally
-COLNAMES <- c("Player", "Game", "Total.Points", "LABEL")
+COLNAMES <- c("Player", "Game", "Total.Points")
 df.POINT.TALLY <- data.frame(matrix(nrow = 0, ncol = length(COLNAMES)))
 colnames(df.POINT.TALLY) <- COLNAMES
 
 # Order by games for the cumulative dataframe build
 df.GAME.inter <- df.GAME[order(df.GAME[["Game"]], decreasing = FALSE),]
 
-## NEED TO FIX THIS BIT!!!!-----
-
 for (PLAYER in PLAYERS) {
   
+  # Create dataframe of gameweeks players have played
   df.inter <- filter(df.GAME.inter, Player %in% PLAYER)
-  df.inter[["Runing.Total"]] <- df.inter[1, "Total.Points"]
-  
-  ## Add label to most recent game for ggplot
-  df.inter[["LABEL"]] <- ""
-  df.inter[nrow(df.inter),][["LABEL"]] <- PLAYER
+  df.inter[["Running.Total"]] <- df.inter[1, "Total.Points"]
   
   if (nrow(df.inter) > 2) {
     for (GAME.NO in seq(2, nrow(df.inter))) {
-      df.inter[GAME.NO, ][["Runing.Total"]] <- df.inter[GAME.NO-1, ][["Runing.Total"]] + df.inter[GAME.NO, ][["Total.Points"]] # More than two games
+      df.inter[GAME.NO, ][["Running.Total"]] <- df.inter[GAME.NO-1, ][["Running.Total"]] + df.inter[GAME.NO, ][["Total.Points"]] # More than two games
     }
   }else{
     
     if (nrow(df.inter) == 2) {
-      df.inter[2,][["Runing.Total"]] <- df.inter[1, ][["Total.Points"]] + df.inter[2, ][["Total.Points"]] # only two games played
+      df.inter[2,][["Running.Total"]] <- df.inter[1, ][["Total.Points"]] + df.inter[2, ][["Total.Points"]] # only two games played
     }
     
   }
   
-  df.inter <- select(df.inter, Player, Game, Runing.Total, LABEL)
+  df.inter <- select(df.inter, Player, Game, Running.Total)
   colnames(df.inter) <- COLNAMES
   
+  MIN.GAME <- min(df.inter[["Game"]])
+  
+  df.inter <- rbind(data.frame(Player = PLAYER,
+                               Game = as.numeric(MIN.GAME)-1,
+                               Total.Points = 0),
+                    df.inter) # Add 0 game start to data
+  
+  #-------------------------------------------------------------------------------------------------
+  # Fill in missed game weeks between first and last game played - needs to be corrected----
+  #MAX.GAME <- max(as.numeric(df.inter[["Game"]]))
+  
+  #if (nrow(df.inter > 2)) {
+    
+    #df.inter <- merge(data.frame(Game = seq(MIN.GAME, MAX.GAME), Total.Points = NA), df.inter,
+    #                  by = "Game", all.x = TRUE, all.y = FALSE)
+    
+    #for (ROW.NO in seq(1, nrow(df.inter))) {
+      
+      #if (df.inter[is.na(df.inter[ROW.NO, ]),]) {
+       # df.inter[ROW.NO,][["Total.Points"]] <- df.inter[ROW.NO-1,][["Total.Points"]]
+      #}
+    #}
+  #}
+  #-----------------------------------------------------------------------------------------------
+  
+  # Add data to master dataset
   df.POINT.TALLY <- rbind(df.POINT.TALLY, df.inter)
 }
 
@@ -308,16 +335,16 @@ gc()
 
 df.POINT.TALLY[["Game"]] <- as.numeric(df.POINT.TALLY[["Game"]])
 TOTAL.POINTS.MAX <- round_any(max(df.POINT.TALLY[["Total.Points"]]) + 1, 20, f = ceiling)
-  
-  # Cumulative total points
-  PLOT.PTS <- ggplot(df.POINT.TALLY, aes(x = Game, y = Total.Points, 
-                                         col = Player, label = LABEL)) +
+
+# Cumulative total points
+PLOT.PTS <- ggplot(df.POINT.TALLY, aes(x = Game, y = Total.Points, 
+                                       col = Player, label = Player)) +
   geom_point() +
-  geom_label_repel() +
+  geom_label() +
   geom_line(alpha = 0.4) +
+  transition_reveal(Game, range = c(0, max(unique(df.POINT.TALLY[["Game"]]))+1)) + # range function tells the function what number of games to show. Adding an extra game makes it pause at the end as if there was another game there
   labs(title = "Cumulative Total points",
        x = "Game week", y = "Total Points") +
-  theme_light() +
   theme(plot.title = element_text(hjust = 0.5),
         axis.line = element_line(color = "black"),
         axis.ticks = element_line(color = "black"),
@@ -417,3 +444,10 @@ reactable(df.GAME %>%
 **Game 03 28/11/2024**
 
 ![*Sarah*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game03_Winner.jpeg){width=250px}
+
+**Game 04 16/12/2024**
+
+![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game004_Winner.jpeg){width=250px}
+```{r WillhelmScream, include=FALSE}
+ beep(2)
+```
