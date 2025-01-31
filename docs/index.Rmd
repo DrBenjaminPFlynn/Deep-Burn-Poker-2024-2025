@@ -1,7 +1,7 @@
 ---
 title: "Deep Burn Poker League"
 author: "Sep 2024 - Aug 2025"
-date: "Sex is good, they say, but poker lasts longer. ~ Al Alvarez"
+date: "Poker has the feeling of a sport, but you don't have to do push-up - Penn Gillette"
 output: 
   prettydoc::html_pretty:
     theme: hpstr
@@ -448,6 +448,11 @@ reactable(df.GAME %>%
 **Game 04 16/12/2024**
 
 ![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game004_Winner.jpeg){width=250px}
+
+**Game 05 30/01/2025**
+
+![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game005.jpg){width=250px}
+
 ```{r WillhelmScream, include=FALSE}
  beep(2)
 ```
