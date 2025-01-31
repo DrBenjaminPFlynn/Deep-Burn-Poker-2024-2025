@@ -1,7 +1,7 @@
 ---
 title: "Deep Burn Poker League"
 author: "Sep 2024 - Aug 2025"
-date: "Poker has the feeling of a sport, but you don't have to do push-up - Penn Gillette"
+date: "Poker has the feeling of a sport, but you don't have to do push-ups - Penn Gillette"
 output: 
   prettydoc::html_pretty:
     theme: hpstr
@@ -372,6 +372,7 @@ PLOT.VLN.PTS <- ggplot(df.GAME, aes(x = Player, y = League.Points)) +
   scale_y_continuous(limits = c(10, 200), breaks = seq(10, 200, 10))
 
 # Distribution of kill points
+MAX.KILLS.PTS <- max(df.GAME[["Kill.Points"]])
 PLOT.KILL.PTS <- ggplot(df.GAME, aes(x = Player, y = Kill.Points)) +
   geom_violin(draw_quantiles = 0.5, fill = "red") +
   geom_point(fill = "black") +
@@ -383,7 +384,7 @@ PLOT.KILL.PTS <- ggplot(df.GAME, aes(x = Player, y = Kill.Points)) +
         axis.ticks = element_line(color = "black"),
         legend.position = "none",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  scale_y_continuous(limits = c(0, 30), breaks = seq(0, 30, 5))
+  scale_y_continuous(limits = c(0, MAX.KILLS.PTS), breaks = seq(0, MAX.KILLS.PTS, 5))
 ```
 
 
