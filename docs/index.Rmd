@@ -1,7 +1,7 @@
 ---
 title: "Deep Burn Poker League"
 author: "Sep 2024 - Aug 2025"
-date: "Poker has the feeling of a sport, but you don't have to do push-ups - Penn Gillette"
+date: "Depend on the rabbits foot if you will, but remember it wasn't lucky for the rabbit - R E Shay"
 output: 
   prettydoc::html_pretty:
     theme: hpstr
@@ -453,6 +453,10 @@ reactable(df.GAME %>%
 **Game 05 30/01/2025**
 
 ![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game005.jpg){width=250px}
+
+**Game 06 27/02/2025**
+
+![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game006_Winner.jpeg){width=250px}
 
 ```{r WillhelmScream, include=FALSE}
  beep(2)
