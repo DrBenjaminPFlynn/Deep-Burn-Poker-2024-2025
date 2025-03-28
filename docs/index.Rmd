@@ -458,6 +458,10 @@ reactable(df.GAME %>%
 
 ![*Pricey*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game006_Winner.jpeg){width=250px}
 
+**Game 07 28/03/2025**
+
+![*Ed*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game07_Winner.jpeg){width=250px}
+
 ```{r WillhelmScream, include=FALSE}
  beep(2)
 ```
