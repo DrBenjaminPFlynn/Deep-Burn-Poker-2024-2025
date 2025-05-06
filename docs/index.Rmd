@@ -462,6 +462,10 @@ reactable(df.GAME %>%
 
 ![*Ed*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game07_Winner.jpeg){width=250px}
 
+**Game 08 24/04/2025**
+
+![*Sarah*](/home/bpf24/Desktop/Poker/2024_2025/2024_2025_Pictures/Game08_Winner.jpeg){wdith=250px}
+
 ```{r WillhelmScream, include=FALSE}
  beep(2)
 ```
