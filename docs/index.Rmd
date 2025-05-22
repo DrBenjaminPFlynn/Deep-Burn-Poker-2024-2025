@@ -1,7 +1,7 @@
 ---
 title: "Deep Burn Poker League"
 author: "Sep 2024 - Aug 2025"
-date: "Depend on the rabbits foot if you will, but remember it wasn't lucky for the rabbit - R E Shay"
+date: "If you can't tell who the sucker is, it's you - unknown"
 output: 
   prettydoc::html_pretty:
     theme: hpstr
